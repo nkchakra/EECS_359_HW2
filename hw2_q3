@@ -1,0 +1,82 @@
+push ebp
+mov ebp, esp
+and esp, 0FFFFFFF0h
+sub esp, 20h
+; set up environment
+call ___main
+mov dword ptr [esp+1Ch], 64h -> [esp+1Ch]=100
+jmp loc_4015D6 (marked by ***)
+; ---------------------------------------------------------------------------
+&&&
+loc_40151B: ; CODE XREF: _main+DE↓j
+mov ecx, [esp+1Ch] -> ecx = 100
+mov edx, 51EB851Fh	-> edx=1374389535
+mov eax, ecx -> eax = 100
+imul edx -> edx = eax*edx = 100*edx = 137438953500 (too many bits)--> log(edx)/log(2) = 38 bits -> 100000->32
+sar edx, 5 -> edx/(2^5) = edx/32 =1
+mov eax, ecx -> eax=100
+sar eax, 1Fh -> MSB of eax -> 0; eax=0
+sub edx, eax -> edx = edx-eax = 1-0=1
+mov eax, edx -> eax=1
+mov [esp+18h], eax -> [esp+18h]=1
+mov eax, [esp+18h] -> eax=1
+imul edx, eax, -64h -> edx = 1*1*-100 = -100
+mov eax, [esp+1Ch] -> eax=100
+lea ecx, [edx+eax] -> ecx points to [edx+eax]->[100+ -100]
+mov edx, 66666667h -> edx=66666667h
+mov eax, ecx -> eax=ecx=pointer to[0]
+imul edx -> edx=edx*eax=66666667h * [0] = 66666667h*100=171798691900 -> 38 bits, shift right 32 bits ->101000 -> 40
+
+sar edx, -> 40/4->10
+mov eax, ecx -> eax=pointer to [0]
+sar eax, 1Fh -> MSB -> 0
+sub edx, eax -> 10-0=0
+
+mov eax, edx -> eax=edx=10
+mov [esp+14h], eax -> [esp+14h]=10
+mov ecx, [esp+1Ch] -> ecx=100
+mov edx, 66666667h -> edx=66666667h
+mov eax, ecx -> eax=100
+imul edx -> eax*edx=40 (look above for calc)
+sar edx, 2 -> 40/4->10
+mov eax, ecx -> eax=ecx=100
+sar eax, 1Fh -> MSB eax=0
+sub edx, eax -> edx=edx-eax=10
+mov eax, edx -> eax=10
+shl eax, 2 -> eax*4=40
+add eax, edx -> eax=edx+eax=50
+add eax, eax -> eax=100
+sub ecx, eax -> ecx=ecx-eax=100-100=0
+mov eax, ecx -> eax=0
+mov [esp+10h], eax -> [esp+10h]=0
+mov eax, [esp+18h] -> eax=1
+imul eax, [esp+18h] -> eax=1*1=1
+imul eax, [esp+18h] -> eax=1*1=1
+mov edx, eax -> edx=1
+mov eax, [esp+14h] -> eax=10
+imul eax, [esp+14h]-> eax=1*10=10
+imul eax, [esp+14h]-> eax=10*10=100
+add edx, eax -> edx=1+100=101
+mov eax, [esp+10h] -> eax=0
+imul eax, [esp+10h] -> 0
+imul eax, [esp+10h] -> 0
+add eax, edx -> 0
+cmp eax, [esp+1Ch] -> (0-100)>=0, flag = 0
+jnz short loc_4015D1 -> jump to this location (occurs), marked by %%%
+mov eax, [esp+1Ch] -> eax=101
+mov [esp+4], eax -> [esp+4]=101
+mov dword ptr [esp], offset aD ; "%d " -> set up print
+call _printf -> printf
+
+loc_4015D1: ; CODE XREF: _main+BB↑j
+add dword ptr [esp+1Ch], 1 -> [esp+1Ch]=101
+
+***
+loc_4015D6: ; CODE XREF: _main+16↑j
+cmp dword ptr [esp+1Ch], 3E7h -> flag = (100-999)>=0=0
+jle loc_40151B -> jump here if flag is 0 (jump occurs), marked by &&&
+
+mov eax, 0 -> zero eax
+leave
+retn
+_main endp

@@ -1,0 +1,28 @@
+push ebp	-> push base pointer to stack
+mov ebp, esp	-> make stack pointer the base pointer
+and esp, 0FFFFFFF0h	-> align stack pointer
+sub esp, 20h	->offset stack pointer after alignment
+call ___main
+mov dword ptr [esp+1Ch], 3 -> define local var as 3
+mov dword ptr [esp+18h], 5	-> define local var as 5
+mov dword ptr [esp+14h], 0	-> define local var as 0 ; NOTE: all these assignments have relative addresses
+
+mov eax, [esp+1Ch] ->eax=3
+imul eax, [esp+18h]	->eax=eax*5 = 15
+mov edx, eax	->edx=15
+mov eax, [esp+1Ch]	->eax=3
+mov ecx, eax	->ecx=3
+shr ecx, 1Fh	->shift ecx(3) right 31 bits = 0
+add eax, ecx	->eax = eax + ecx = 3+0=3
+sar eax, 1	->signed bit shift by 1 bit, eax = eax/2=3/2=1
+sub edx, eax	->edx=edx-eax, 15-1
+mov eax, edx 	->eax=edx=15-1
+mov [esp+14h], edx 	->local var @ [esp+14h]=edx=15-1=14
+mov eax, [esp+14h]	->eax = local var @[esp+14h]=14
+mov [esp+4], edx 	-> [esp+4]=14; on stack
+mov dword ptr [esp], offset aD ; "%d"	-> put string on top of stack
+call _printf	->printf
+mov eax, 0	->eax=0 (rezero eax)
+leave
+retn	-> return 0
+_main endp

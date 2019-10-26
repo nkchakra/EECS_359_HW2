@@ -1,0 +1,47 @@
+push ebp
+mov ebp, esp
+and esp, 0FFFFFFF0h
+sub esp, 40h
+; everything above is setting up environment
+call ___main
+mov dword ptr [esp+18h], 0Ch -> local var a @ [esp+18h]=12
+mov dword ptr [esp+1Ch], 0Fh -> local var b @ [esp+0Fh]=15
+mov dword ptr [esp+20h], 0DDh -> local var c @ [esp+20h]=221
+mov dword ptr [esp+24h], 3 -> local var d @ [esp+24Ch]=3
+mov dword ptr [esp+28h], 1B0h -> local var e @ [esp+28h]=432
+mov dword ptr [esp+2Ch], 36h -> local var f @ [esp+2Ch]=54
+mov dword ptr [esp+30h], 10h -> local var g @ [esp+30h]=16
+mov dword ptr [esp+34h], 43h -> local var h @ [esp+34h]=67
+mov dword ptr [esp+3Ch], 0 -> local var i @ [esp+3Ch]=0
+mov dword ptr [esp+38h], 0 -> local var j @ [esp+38h]=0
+jmp short loc_40157F	-> jump to this location (marked by ***)
+
+; ------------------------------------------------------
+
+^^^
+loc_401560: ; CODE XREF: _main+84↓j
+mov eax, [esp+38h]	-> eax=j=0
+mov eax, [esp+eax*4+18h] -> eax = [esp+0+18h]=12
+cmp eax, [esp+3Ch]	->flag=(12-0)>0 = 1
+jle short loc_40157A 	-> jump to this location (marked by &&&) if flag is 0 (no jump)
+mov eax, [esp+38h] 	-> eax = 0
+mov eax, [esp+eax*4+18h] -> eax = [esp+0+18h]=12
+mov [esp+3Ch], eax -> [esp+3Ch]=eax; i=12
+; now go back to where this location was called from (loc_40157F)
+
+&&&
+loc_40157A: ; CODE XREF: _main+6C↑j
+add dword ptr [esp+38h], 1 	-> unreached code
+
+***
+loc_40157F: ; CODE XREF: _main+5E↑j - > define location
+cmp dword ptr [esp+38h], 7	-> flag=(j-7=0
+jle short loc_401560	-> jump to this location(marked by ^^^) if flag is 0 (jump occurs)
+mov eax, [esp+3Ch] ->eax=12
+mov [esp+4], eax -> [esp+4]=12
+mov dword ptr [esp], offset aD ; "%d" ->format string
+call _printf	-> printf on [esp+4]=12
+mov eax, 0 -> rezero eax
+leave
+retn -> return 0
+A0 _main endp
